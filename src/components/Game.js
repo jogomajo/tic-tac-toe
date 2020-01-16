@@ -11,12 +11,17 @@ class Game extends React.Component {
         }
       ],
       stepNumber: 0,
-      xIsNext: true
+      xIsNext: true,
+      indexesClicked: []
     };
   }
 
   handleClick(i) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const historyCoor = this.state.indexesClicked.slice(
+      0,
+      this.state.stepNumber
+    );
     const current = history[history.length - 1];
     const squares = [...current.squares];
 
@@ -25,6 +30,7 @@ class Game extends React.Component {
     }
 
     squares[i] = this.state.xIsNext ? "X" : "O";
+
     this.setState({
       history: history.concat([
         {
@@ -32,11 +38,12 @@ class Game extends React.Component {
         }
       ]),
       stepNumber: history.length,
-      xIsNext: !this.state.xIsNext
+      xIsNext: !this.state.xIsNext,
+      indexesClicked: historyCoor.concat(i)
     });
   }
 
-  jumpTo(step) {
+  jumpTo(step, e) {
     this.setState({
       stepNumber: step,
       xIsNext: step % 2 === 0
@@ -49,10 +56,32 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
-      const desc = move ? "Go to move #" + move : "Go to game start";
+      const x = (this.state.indexesClicked[move - 1] % 3) + 1;
+      const y = () => {
+        const coor = this.state.indexesClicked[move - 1];
+        if (coor === 0 || coor === 1 || coor === 2) {
+          return 1;
+        } else if (coor === 3 || coor === 4 || coor === 5) {
+          return 2;
+        } else if (coor === 6 || coor === 7 || coor === 8) {
+          return 3;
+        }
+      };
+
+      const desc = move
+        ? `Go to move #${move} | x:${x} y:${y()}`
+        : "Go to game start";
+
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button
+            style={
+              move === this.state.stepNumber ? { fontWeight: "bold" } : null
+            }
+            onClick={e => this.jumpTo(move, e)}
+          >
+            {desc}
+          </button>
         </li>
       );
     });
@@ -92,6 +121,7 @@ function calculateWinner(squares) {
 
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
+
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
       return squares[a];
     }
