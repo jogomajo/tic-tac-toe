@@ -12,7 +12,8 @@ class Game extends React.Component {
       ],
       stepNumber: 0,
       xIsNext: true,
-      indexesClicked: []
+      indexesClicked: [null],
+      sort: true
     };
   }
 
@@ -20,7 +21,7 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const historyCoor = this.state.indexesClicked.slice(
       0,
-      this.state.stepNumber
+      this.state.stepNumber + 1
     );
     const current = history[history.length - 1];
     const squares = [...current.squares];
@@ -43,22 +44,32 @@ class Game extends React.Component {
     });
   }
 
-  jumpTo(step, e) {
+  jumpTo(step) {
     this.setState({
       stepNumber: step,
       xIsNext: step % 2 === 0
     });
   }
 
+  handleSort = () => {
+    this.setState({
+      sort: !this.state.sort,
+      history: this.state.history.reverse(),
+      indexesClicked: this.state.indexesClicked.reverse()
+    });
+  };
+
   render() {
     const history = this.state.history;
+
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
-      const x = (this.state.indexesClicked[move - 1] % 3) + 1;
+      // console.log("render map");
+      const x = (this.state.indexesClicked[move] % 3) + 1;
       const y = () => {
-        const coor = this.state.indexesClicked[move - 1];
+        const coor = this.state.indexesClicked[move];
         if (coor === 0 || coor === 1 || coor === 2) {
           return 1;
         } else if (coor === 3 || coor === 4 || coor === 5) {
@@ -72,15 +83,22 @@ class Game extends React.Component {
         ? `Go to move #${move} | x:${x} y:${y()}`
         : "Go to game start";
 
+      const sortDesc =
+        move === this.state.history.length - 1
+          ? "Go to game start"
+          : `Go to move #${this.state.history.length -
+              1 -
+              move} | x:${x} y:${y()}`;
+
       return (
         <li key={move}>
           <button
             style={
               move === this.state.stepNumber ? { fontWeight: "bold" } : null
             }
-            onClick={e => this.jumpTo(move, e)}
+            onClick={_ => this.jumpTo(move)}
           >
-            {desc}
+            {this.state.sort ? desc : sortDesc}
           </button>
         </li>
       );
@@ -100,7 +118,8 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <ol reversed={this.state.sort ? false : true}>{moves}</ol>
+          <button onClick={this.handleSort}>Sort</button>
         </div>
       </div>
     );
