@@ -33,11 +33,12 @@ class Game extends React.Component {
     squares[i] = this.state.xIsNext ? "X" : "O";
 
     this.setState({
-      history: history.concat([
+      history: [
+        ...history,
         {
           squares: squares
         }
-      ]),
+      ],
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
       indexesClicked: historyCoor.concat(i)
@@ -61,12 +62,10 @@ class Game extends React.Component {
 
   render() {
     const history = this.state.history;
-
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
-      // console.log("render map");
       const x = (this.state.indexesClicked[move] % 3) + 1;
       const y = () => {
         const coor = this.state.indexesClicked[move];
@@ -104,11 +103,26 @@ class Game extends React.Component {
       );
     });
 
+    if (this.state.stepNumber === 9 && !winner) {
+      setTimeout(() => {
+        alert("No more possible moves to do. It's a draw!");
+      }, 0);
+    }
+
     let status;
+    const getAllSquares = [...document.querySelectorAll(".square")];
     if (winner) {
-      status = `Winner: ${winner};`;
+      const [winningSquare, a, b, c] = winner;
+      const winningLine = [
+        getAllSquares[a],
+        getAllSquares[b],
+        getAllSquares[c]
+      ];
+      winningLine.map(square => square.classList.add("underline"));
+      status = `Winner: ${winningSquare};`;
     } else {
       status = `Next player: ${this.state.xIsNext ? "X" : "O"}`;
+      getAllSquares.map(square => square.classList.remove("underline"));
     }
 
     return (
@@ -142,7 +156,7 @@ function calculateWinner(squares) {
     const [a, b, c] = lines[i];
 
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return [squares[a], a, b, c];
     }
   }
   return null;
