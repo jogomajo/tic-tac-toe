@@ -88,12 +88,6 @@ class Game extends React.Component {
       );
     });
 
-    if (this.state.stepNumber === 9 && !winner) {
-      setTimeout(() => {
-        alert("No more possible moves to do. It's a draw!");
-      }, 0);
-    }
-
     let status;
     const getAllSquares = [...document.querySelectorAll(".square")];
     if (winner) {
@@ -108,6 +102,10 @@ class Game extends React.Component {
     } else {
       status = `Next player: ${this.state.xIsNext ? "X" : "O"}`;
       getAllSquares.map(square => square.classList.remove("underline"));
+
+      if (this.state.stepNumber === 9) {
+        status = "Draw!";
+      }
     }
 
     return (
@@ -115,7 +113,7 @@ class Game extends React.Component {
         <Board squares={current.squares} onClick={i => this.handleClick(i)} />
         <div className="game-info">
           <div className="status">{status}</div>
-          <ol className="moves">{moves}</ol>
+          <ul className="moves">{moves}</ul>
         </div>
       </div>
     );
