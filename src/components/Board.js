@@ -14,28 +14,16 @@ class Board extends React.Component {
 
   createBoard = () => {
     let board = [];
-    let number = 0;
 
-    for (let row = 0; row < 3; row++) {
-      let squares = [];
-
-      for (let i = number; i < number + 3; i++) {
-        squares.push(this.renderSquare(i));
-      }
-
-      number += 3;
-      board.push(
-        <div key={row} className="board-row">
-          {squares}
-        </div>
-      );
+    for (let i = 0; i < 9; i++) {
+      board.push(this.renderSquare(i));
     }
 
     return board;
   };
 
   render() {
-    return <div>{this.createBoard()}</div>;
+    return <div className="game-board">{this.createBoard()}</div>;
   }
 }
 

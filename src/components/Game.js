@@ -12,8 +12,7 @@ class Game extends React.Component {
       ],
       stepNumber: 0,
       xIsNext: true,
-      indexesClicked: [null],
-      sort: true
+      indexesClicked: [null]
     };
   }
 
@@ -52,14 +51,6 @@ class Game extends React.Component {
     });
   }
 
-  handleSort = () => {
-    this.setState({
-      sort: !this.state.sort,
-      history: this.state.history.reverse(),
-      indexesClicked: this.state.indexesClicked.reverse()
-    });
-  };
-
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -82,22 +73,16 @@ class Game extends React.Component {
         ? `Go to move #${move} | x:${x} y:${y()}`
         : "Go to game start";
 
-      const sortDesc =
-        move === this.state.history.length - 1
-          ? "Go to game start"
-          : `Go to move #${this.state.history.length -
-              1 -
-              move} | x:${x} y:${y()}`;
-
       return (
         <li key={move}>
           <button
+            className="moves__btn"
             style={
               move === this.state.stepNumber ? { fontWeight: "bold" } : null
             }
             onClick={_ => this.jumpTo(move)}
           >
-            {this.state.sort ? desc : sortDesc}
+            {desc}
           </button>
         </li>
       );
@@ -119,7 +104,7 @@ class Game extends React.Component {
         getAllSquares[c]
       ];
       winningLine.map(square => square.classList.add("underline"));
-      status = `Winner: ${winningSquare};`;
+      status = `Winner: ${winningSquare}`;
     } else {
       status = `Next player: ${this.state.xIsNext ? "X" : "O"}`;
       getAllSquares.map(square => square.classList.remove("underline"));
@@ -127,13 +112,10 @@ class Game extends React.Component {
 
     return (
       <div className="game">
-        <div className="game-board">
-          <Board squares={current.squares} onClick={i => this.handleClick(i)} />
-        </div>
+        <Board squares={current.squares} onClick={i => this.handleClick(i)} />
         <div className="game-info">
-          <div>{status}</div>
-          <ol reversed={this.state.sort ? false : true}>{moves}</ol>
-          <button onClick={this.handleSort}>Sort</button>
+          <div className="status">{status}</div>
+          <ol className="moves">{moves}</ol>
         </div>
       </div>
     );
